@@ -18,3 +18,9 @@ $( document ).ready(function() {
     });
   });
 });
+
+$.getJSON('http://127.0.0.1:5001/api/v1/status/', function(data) {
+    if (data['status'] === 'OK') {
+      $('DIV#api_status').toggleClass('available')
+    }
+});
