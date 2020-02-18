@@ -1,19 +1,18 @@
-const list = {};
+const amenities = {};
 $(document).ready(function () {
   const liSelector = 'div.amenities ul.popover li';
   $(liSelector + ' input:checkbox').each(function (index) {
     $(this).click(function () {
       const dataId = $(this).parent().attr('data-id');
       if ($(this).prop('checked')) {
-        list[dataId] = $(this).parent().text();
+        amenities[dataId] = $(this).parent().text();
       } else {
-        delete list[dataId];
+        delete amenities[dataId];
       }
-      // console.log(list);
       const h4 = $('div.amenities h4');
       h4.text('');
-      for (const key in list) {
-        h4.text(h4.text() + list[key] + ', ');
+      for (const key in amenities) {
+        h4.text(h4.text() + amenities[key] + ', ');
       }
     });
   });
@@ -34,10 +33,40 @@ $.ajax({
   },
   dataType: 'json',
   success: function (data) {
-    for (const key in data) {
-      const place = data[key];
-      $('section.places').append(
-        '<article>' +
+    appendPlaces(data);
+  }
+});
+$(document).ready(function () {
+  $('BUTTON').click(function () {
+    $('.places').empty();
+    const amenitiesDict = {
+      amenities: amenities
+    };
+    $.ajax({
+      url: 'http://0.0.0.0:5001/api/v1/places_search/',
+      type: 'POST',
+      data: JSON.stringify(amenitiesDict),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      dataType: 'json',
+      success: function (data) {
+        console.log(data);
+        appendPlaces(data);
+      },
+      error: function (err) {
+        console.log(err);
+      }
+    });
+  });
+});
+
+function appendPlaces (data) {
+  // console.log(data);
+  for (const key in data) {
+    const place = data[key];
+    $('section.places').append(
+      '<article>' +
             '<div class="title">' +
               '<h2>' + place.name + '</h2>' +
               '<div class="price_by_night">' +
@@ -65,6 +94,5 @@ $.ajax({
               place.description +
             '</div>' +
             '</article>');
-    }
   }
-});
+}
